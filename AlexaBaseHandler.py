@@ -100,10 +100,6 @@ class AlexaBaseHandler(object):
     def _build_speechlet_response_without_card(self, speech_output, reprompt_text, should_end_session):
         """
         Internal helper method to build the speechlet portion of the response without the card
-        :param speech_output:
-        :param reprompt_text:
-        :param should_end_session:
-        :return:
         """
         return {
             'outputSpeech': {
@@ -122,12 +118,6 @@ class AlexaBaseHandler(object):
     def _build_speechlet_response(self, card_title, card_output, speech_output, reprompt_text, should_end_session):
         """
         Internal helper method to build the speechlet portion of the response
-        :param card_title:
-        :param card_output:
-        :param speech_output:
-        :param reprompt_text:
-        :param should_end_session:
-        :return:
         """
         return {
             'outputSpeech': {
@@ -151,8 +141,6 @@ class AlexaBaseHandler(object):
     def _build_response(self, session_attributes, speechlet_response):
         """
         Internal helper method to build the Alexa response message
-        :param session_attributes:
-        :param speechlet_response:
         :return: properly formatted Alexa response
         """
         return {
@@ -194,6 +182,32 @@ class AlexaBaseHandler(object):
             else:
                 value = None
         except Exception as exc:
-            self.logger.error("Error getting slot value for slot_name={0}".format(slot_name))
+            self.logger.error("Error getting slot value for slot_name={0}, error={1}"
+                              .format(slot_name, exc))
 
         return value
+
+    def _attribute_exists(self, attribute_name, session):
+        """
+        :param attribute_name: str
+        :param session: dict
+        :return: bool
+        """
+        if attribute_name in session['attributes']:
+            return True
+        else:
+            return False
+
+    def _get_attribute(self, attribute_name, session):
+        attribute = None
+        try:
+            if self._attribute_exists(attribute_name, session):
+                attribute = session['attributes'][attribute_name]
+            else:
+                attribute = None
+        except Exception as exc:
+            self.logger.error("Error getting attribute for attribute={0}, error={1}"
+                              .format(attribute_name, exc))
+
+        return attribute
+

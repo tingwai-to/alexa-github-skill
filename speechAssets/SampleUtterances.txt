@@ -4,9 +4,7 @@ TopRepos what are the top repositories on github
 TopRepos what are the top repos on github
 TopRepos what are the top github repositories
 TopRepos what are the top github repos
-TopRepos what're the top repositories
-TopRepos what're the top repos
-TopRepos what're the top repositories on github
-TopRepos what're the top repos on github
-TopRepos what're the top github repositories
-TopRepos what're the top github repos
+RepeatRepo repeat {Number}
+RepeatRepo repeat number {Number}
+RepeatRepo say {Number} again
+RepeatRepo say number {Number} again

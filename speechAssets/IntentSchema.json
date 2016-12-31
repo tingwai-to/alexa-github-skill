@@ -1,7 +1,25 @@
 {
   "intents": [
     {
-      "intent": "TopRepos"
+      "intent": "TopRepos",
+      "slots": [
+        {
+          "name": "Date",
+          "type": "AMAZON.DATE"
+        }
+      ]
+    },
+    {
+      "intent": "RepeatRepo",
+      "slots": [
+        {
+          "name": "Number",
+          "type": "AMAZON.NUMBER"
+        }
+      ]
+    },
+    {
+      "intent": "AMAZON.RepeatIntent"
     },
     {
       "intent": "AMAZON.HelpIntent"

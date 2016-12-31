@@ -5,6 +5,8 @@ import json
 
 
 def get_top_repo():
+    N_REPOS = 5
+
     # date of 1 week ago
     now = datetime.now()
     past = now - timedelta(weeks=1)
@@ -18,14 +20,14 @@ def get_top_repo():
              'order': 'desc'}
     r = requests.get(url, headers=headers, params=query)
 
-    # convert response object to json and get top 5 repos
+    # convert response object to json and get top N repos
     data = json.loads(r.text)  # dict
-    data = data['items'][0:5]  # list of repos
+    data = data['items'][0:N_REPOS]  # list of repos
 
     # filter specific keys
     keys_keep = ['name', 'description', 'language', 'watchers', 'html_url']
-    top5 = []
-    for repo in data:
+    top_repos = {}  # dict used to store in session_attributes
+    for i, repo in enumerate(data):
         filtered = {}
         for key in keys_keep:
             # remove non-ascii, Alexa can't pronounce foreign characters
@@ -33,6 +35,7 @@ def get_top_repo():
                 filtered[key] = repo[key].encode('ascii', 'ignore')
             else:
                 filtered[key] = repo[key]
-        top5.append(filtered)
+        # str(i) because key must be type string for session_attributes
+        top_repos[str(i)] = filtered
 
-    return top5  # list of dicts
+    return top_repos, N_REPOS  # dict of dicts

@@ -25,7 +25,7 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
               ", sessionId=" + session['sessionId'])
 
         session_attributes = {}
-        speech_output = "Exiting Alexa github skill from on session ended."
+        speech_output = "Exiting Alexa github skill."
         reprompt_text = None
         should_end_session = True
 
@@ -43,6 +43,10 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
         # Dispatch to skill's intent handlers
         if intent_name == "TopRepos":
             return self.handle_top_repo(intent, session)
+        elif intent_name == "RepeatRepo":
+            return self.handle_repeat_repo(intent, session)
+        # elif intent_name == "AMAZON.RepeatIntent":
+        #     return self.handle_repeat_speech(intent, session)
         elif intent_name == "AMAZON.HelpIntent":
             return self.get_welcome_response()
         elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
@@ -72,7 +76,7 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
 
     def handle_session_end_request(self):
         session_attributes = {}
-        speech_output = "Exiting Alexa github skill from handle session end request."
+        speech_output = "Exiting Alexa github skill."
         reprompt_text = None
         should_end_session = True
 
@@ -81,23 +85,24 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
         return self._build_response(session_attributes, speechlet)
 
     def handle_top_repo(self, intent, session):
-        repos = github.get_top_repo()
+        top_repos, N_REPOS = github.get_top_repo()
 
-        speech_readout = "Top five repos this week are,\n "
-        for i, repo in enumerate(repos):
-            speech_readout += "#{0}. Name: {1}. Description: {2}. Language: {3}. "\
+        speech_readout = "Top five repos this week are, \n"
+        card_readout = "Top five repos this week are: \n"
+        for i in range(N_REPOS):
+            repo = top_repos[str(i)]
+
+            speech_readout += "#{0}. Name: {1}. Description: {2}. Language: {3}. " \
                 .format(i+1, repo['name'], repo['description'], repo['language'])
 
-        card_readout = "Top five repos this week are, "
-        for i, repo in enumerate(repos):
-            card_readout += "#{0}. {1}\n "\
-                            "Description: {2}\n "\
-                            "Language: {3}\n "\
-                            "URL:{4}\n "\
+            card_readout += "#{0}. {1} \n" \
+                            "Description: {2} \n" \
+                            "Language: {3} \n" \
+                            "URL: {4} \n" \
                 .format(i+1, repo['name'], repo['description'],
                         repo['language'], repo['html_url'])
 
-        session_attributes = {}
+        session_attributes = {'top_repos': top_repos}
         card_title = "Top 5 GitHub Repos"
         card_output = card_readout
         speech_output = speech_readout
@@ -107,3 +112,39 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
         speechlet = self._build_speechlet_response(card_title, card_output, speech_output, reprompt_text, should_end_session)
 
         return self._build_response(session_attributes, speechlet)
+
+    def handle_repeat_repo(self, intent, session):
+        repeat_num = intent['slots']['Number']['value']  # str
+        repeat_num = str(int(repeat_num)-1)  # account for 0 index, #1->index_0
+
+        top_repos = self._get_attribute('top_repos', session)
+        # None if user asks to repeat a number without asking for repos first
+        if top_repos is None:
+            return self.get_welcome_response()
+
+        # TODO: return better error message to user
+        if repeat_num not in top_repos:
+            return self.get_welcome_response()
+
+        repo = top_repos[repeat_num]
+        speech_output = "#{0}. Name: {1}. Description: {2}. Language: {3}. " \
+            .format(int(repeat_num)+1, repo['name'],
+                    repo['description'], repo['language'])
+
+        reprompt_text = None
+        should_end_session = False
+
+        speechlet = self._build_speechlet_response_without_card(speech_output, reprompt_text, should_end_session)
+
+        return self._build_response(session['attributes'], speechlet)
+
+    # WIP
+    # def handle_repeat_speech(self, intent, session):
+    #     top_repos = self._get_attribute('top_repos', session)
+    #     # None if user asks to repeat a number without asking for repos first
+    #     # and new_session==True if user invokes RepeatIntent as first command
+    #     new_session = session['new']
+    #     if top_repos is None and new_session:
+    #         return self.get_welcome_response()
+    #
+    #     return self.handle_top_repo(intent, session)
