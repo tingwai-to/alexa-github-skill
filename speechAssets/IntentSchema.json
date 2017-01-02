@@ -5,7 +5,11 @@
       "slots": [
         {
           "name": "Date",
-          "type": "AMAZON.DATE"
+          "type": "LIST_OF_TIME"
+        },
+        {
+          "name": "Language",
+          "type": "LIST_OF_PROGRAMMING_LANGUAGES"
         }
       ]
     },
@@ -17,9 +21,6 @@
           "type": "AMAZON.NUMBER"
         }
       ]
-    },
-    {
-      "intent": "AMAZON.RepeatIntent"
     },
     {
       "intent": "AMAZON.HelpIntent"
