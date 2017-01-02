@@ -19,7 +19,7 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
 
     def on_session_ended(self, session_ended_request, session):
         session_attributes = {}
-        speech_output = "Exiting Alexa github skill."
+        speech_output = "Exiting Repo Tree."
         reprompt_text = None
         should_end_session = True
 
@@ -40,7 +40,7 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
         # elif intent_name == "AMAZON.RepeatIntent":
         #     return self.handle_repeat_speech(intent, session)
         elif intent_name == "AMAZON.HelpIntent":
-            return self.get_welcome_response()
+            return self.handle_help_response()
         elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
             return self.handle_session_end_request()
         else:
@@ -53,20 +53,47 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
         """
         session_attributes = {}
         card_title = "Welcome"
-        card_output = "Welcome to Alexa Github Skill. " \
-                      "Try asking me about the top repositories on github."
+        card_output = "Welcome to Repo Tree. " \
+                      "Try asking me about the top repositories on GitHub."
         speech_output = card_output
         reprompt_text = "I didn't catch that. " \
-                        "Try asking me about the top repositories on github."
+                        "Try asking me about the top repositories on GitHub."
         should_end_session = False
 
         speechlet = self._build_speechlet_response(card_title, card_output, speech_output, reprompt_text, should_end_session)
 
         return self._build_response(session_attributes, speechlet)
 
+    def handle_help_response(self):
+        """
+        Handle AMAZON.HelpIntent. Will provide examples
+        :return: output of _build_response
+        """
+        session_attributes = {}
+        card_title = "Help"
+        card_output = \
+            "Repo Tree tracks the top trending repositories on GitHub. " \
+            "I can also filter them by the past day, week, month, or year in just about any programming language. " \
+            "For example, try asking me, what're the top repos in the past week written in Python. \n" \
+            "More examples: \n" \
+            "Alexa, ask Repo Tree about the top repos \n" \
+            "Alexa, ask Repo Tree what're the top Python repos \n" \
+            "Alexa, ask Repo Tree what're top repos in the past month \n" \
+            "Alexa, ask Repo Tree about the top repos in the past week written in Java \n"
+        speech_output = \
+            'Repo Tree <break time="0.1s"/> tracks the top trending repositories on GitHub. ' \
+            'I can also filter them by the past day, <break time="0.1s"/> week, <break time="0.1s"/> month, or year <break time="0.1s"/> in most programming languages. ' \
+            'For example, try asking me, what\'re the top repos in the past week written in Python.'
+        reprompt_text = "Check your Alexa app for more examples."
+        should_end_session = False
+
+        speechlet = self._build_speechlet_ssml(card_title, card_output, speech_output, reprompt_text, should_end_session)
+
+        return self._build_response(session_attributes, speechlet)
+
     def handle_session_end_request(self):
         session_attributes = {}
-        speech_output = "Exiting Alexa github skill."
+        speech_output = "Exiting Repo Tree."
         reprompt_text = None
         should_end_session = True
 
@@ -88,13 +115,13 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
             language_readout = ''
         elif date is None and language is not None:
             date_readout = 'day'
-            language_readout = language
+            language_readout = github.convert_language(language)
         elif date is not None and language is None:
             date_readout = date
             language_readout = ''
         else:
             date_readout = date
-            language_readout = language
+            language_readout = github.convert_language(language)
 
         speech_readout = "Top five {1} repos in the past {0} are, \n"\
             .format(date_readout, language_readout)
@@ -136,7 +163,7 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
 
         # when user asks for a number not provided earlier
         if repeat_num not in top_repos:
-            return self._build_quick_response(intent_request, session, "#{0} not available".format(repeat_num + 1))
+            return self._build_quick_response(intent_request, session, "#{0} not available".format(int(repeat_num) + 1))
 
         repo = top_repos[repeat_num]
         speech_output = "#{0}. Name: {1}. Description: {2}. Language: {3}. " \

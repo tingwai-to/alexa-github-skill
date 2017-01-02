@@ -5,6 +5,14 @@ TopRepos what are the top github repos
 TopRepos what are the top repos in the past {Date} written in {Language}
 TopRepos what are the top repos in the past {Date}
 TopRepos what are the top repos written in {Language}
+TopRepos what are the top github repos in the past {Date} written in {Language}
+TopRepos what are the top github repos in the past {Date}
+TopRepos what are the top github repos written in {Language}
+TopRepos what are the top {Language} repos in the past {Date}
+TopRepos what are the top {Language} repos
+TopRepos what are the top {Language} github repos in the past {Date}
+TopRepos what are the top {Language} github repos
+
 TopRepos top repositories
 TopRepos top repos
 TopRepos top github repositories
@@ -15,6 +23,10 @@ TopRepos top repos written in {Language}
 TopRepos top github repos in the past {Date} written in {Language}
 TopRepos top github repos in the past {Date}
 TopRepos top github repos written in {Language}
+TopRepos top {Language} repos in the past {Date}
+TopRepos top {Language} repos
+TopRepos top {Language} github repos in the past {Date}
+TopRepos top {Language} github repos
 
 RepeatRepo repeat {Number}
 RepeatRepo repeat number {Number}

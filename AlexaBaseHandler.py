@@ -144,6 +144,29 @@ class AlexaBaseHandler(object):
             'shouldEndSession': should_end_session
         }
 
+    def _build_speechlet_ssml(self, card_title, card_output, speech_output, reprompt_text, should_end_session):
+        """
+        Internal helper method to build the speechlet portion of the response
+        """
+        return {
+            'outputSpeech': {
+                'type': 'SSML',
+                'ssml': '<speak>' + speech_output + '</speak>'
+            },
+            'card': {
+                'type': 'Simple',
+                'title': card_title,
+                'content': card_output
+            },
+            'reprompt': {
+                'outputSpeech': {
+                    'type': 'PlainText',
+                    'text': reprompt_text
+                }
+            },
+            'shouldEndSession': should_end_session
+        }
+
     def _build_response(self, session_attributes, speechlet_response):
         """
         Internal helper method to build the Alexa response message

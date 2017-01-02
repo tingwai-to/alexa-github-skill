@@ -30,40 +30,37 @@ def convert_language(language_value):
     value = 'null'
     try:
         language_value = language_value.lower()
-        table = {'javascript': 'javascript',
-                'java': 'java',
-                 'python': 'python',
-                 'css': 'css',
-                 'php': 'php',
-                 'ruby': 'ruby',
-                 'c plus plus': 'c++',
-                 'c': 'c',
-                 'shell': 'shell',
-                 'c sharp': 'c#',
-                 'objective c': 'objective-c',
-                 'r': 'r',
-                 'vim l': 'viml',
-                 'go': 'go',
-                 'perl': 'perl',
-                 'coffee script': 'coffeescript',
+        table = {'javascript': 'JavaScript',
+                 'java': 'Java',
+                 'python': 'Python',
+                 'css': 'CSS',
+                 'php': 'PHP',
+                 'ruby': 'Ruby',
+                 'c plus plus': 'C++',
+                 'c': 'C',
+                 'shell': 'Shell',
+                 'c sharp': 'C#',
+                 'objective c': 'Objective-C',
+                 'r': 'R',
+                 'vim l': 'VimL',
+                 'go': 'Go',
+                 'perl': 'Perl',
+                 'coffee script': 'CoffeeScript',
                  'tex': 'TeX',
-                 'swift': 'swift',
-                 'scala': 'scala',
-                 'emacs lisp': 'emacslisp',
-                 'haskell': 'haskell',
-                 'lua': 'lua',
-                 'clojure': 'clojure',
-                 'matlab': 'matlab',
-                 'arduino': 'arduino',
-                 'make file': 'makefile',
-                 'groovy': 'groovy',
-                 'puppet': 'puppet',
-                 'rust': 'rust',
-                 'powershell': 'powershell',
-                 'html': 'html',
-                 'vba': 'vba',
-                 'visual basic': 'visualbasic',
-                 'delphi': 'delphi'}
+                 'swift': 'Swift',
+                 'scala': 'Scala',
+                 'emacs lisp': 'EmacsLisp',
+                 'haskell': 'Haskell',
+                 'lua': 'Lua',
+                 'clojure': 'Clojure',
+                 'matlab': 'Matlab',
+                 'arduino': 'Arduino',
+                 'make file': 'Makefile',
+                 'groovy': 'Groovy',
+                 'puppet': 'Puppet',
+                 'rust': 'Rust',
+                 'powershell': 'Powershell',
+                 'html': 'HTML'}
         if language_value in table:
             value = table[language_value]
         else:
@@ -79,7 +76,7 @@ def get_top_repo(date_value=None, language_value=None):
 
     date_decrement = convert_date(date_value)
     language = convert_language(language_value)
-    print(type(date_decrement), date_decrement, type(language), language)
+    print(date_value, date_decrement, language_value, language)
 
     now = date.today()
     past = now - date_decrement
