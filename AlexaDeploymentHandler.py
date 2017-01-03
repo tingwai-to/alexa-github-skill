@@ -73,7 +73,7 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
         card_title = "Help"
         card_output = \
             "Repo Tree tracks the top trending repositories on GitHub. " \
-            "I can also filter them by the past day, week, month, or year in just about any programming language. " \
+            "I can also filter them by the past day, week, month, or year in most programming languages. " \
             "For example, try asking me, what're the top repos in the past week written in Python. \n" \
             "More examples: \n" \
             "Alexa, ask Repo Tree about the top repos \n" \

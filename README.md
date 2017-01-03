@@ -7,7 +7,7 @@ Examples:
 Alexa, ask Repo Tree about the top repos
 Alexa, ask Repo Tree what're the top Python repos
 Alexa, ask Repo Tree what are top repos in the past month
-Alexa, ask Repo Tree about the top repos in the past week written in Ja
+Alexa, ask Repo Tree about the top repos in the past week written in Java
 ```
 
 When a time frame is not specified, top repos from the past day are returned. When a language is not specified, top repos from all languages are returned.
