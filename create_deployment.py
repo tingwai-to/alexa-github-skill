@@ -23,10 +23,14 @@ if not os.path.exists(root_deployments_dir):
 # List of files that should be included in the deployment
 # Only the files listed here, and the libraries in the requirements.txt
 # file will be included in the deployment.
-deployment_files = ['AlexaBaseHandler.py',
-                    'AlexaDeploymentHandler.py',
-                    'main.py',
-                    'github.py']
+deployment_files =\
+    ['AlexaBaseHandler.py',
+     'AlexaDeploymentHandler.py',
+     'main.py',
+     'github.py',
+     'speechAssets/customSlotTypes/LIST_OF_PROGRAMMING_LANGUAGES',
+     'speechAssets/customSlotTypes/LIST_OF_TIME'
+     ]
 
 def _read_requirements():
     with open("./requirements.txt", 'r') as f:

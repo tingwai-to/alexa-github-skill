@@ -1,5 +1,6 @@
 from AlexaBaseHandler import AlexaBaseHandler
 import github
+import random
 
 
 class AlexaDeploymentHandler(AlexaBaseHandler):
@@ -37,8 +38,8 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
             return self.handle_top_repo(intent_request, session)
         elif intent_name == "RepeatRepo":
             return self.handle_repeat_repo(intent_request, session)
-        # elif intent_name == "AMAZON.RepeatIntent":
-        #     return self.handle_repeat_speech(intent, session)
+        elif intent_name == "FeelingLucky":
+            return self.handle_feeling_lucky(intent_request, session)
         elif intent_name == "AMAZON.HelpIntent":
             return self.handle_help_response()
         elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
@@ -103,11 +104,51 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
 
     def handle_top_repo(self, intent_request, session):
         print(intent_request)
-        # print(session)
 
         date = self._get_slot_value('Date', intent_request)
         language = self._get_slot_value('Language', intent_request)
         print(date, language)
+
+        return self.create_repo_response(date, language)
+
+    def handle_repeat_repo(self, intent_request, session):
+        repeat_num = self._get_slot_value('Number', intent_request)  # str
+        repeat_num = str(int(repeat_num)-1)  # account for 0 index, #1->index_0
+
+        top_repos = self._get_attribute('top_repos', session)
+        # None if user asks to repeat a number without asking for repos first
+        if top_repos is None:
+            return self.get_welcome_response()
+
+        # when user asks for a number not provided earlier
+        if repeat_num not in top_repos:
+            return self._build_quick_response(intent_request, session, "#{0} not available".format(int(repeat_num) + 1))
+
+        repo = top_repos[repeat_num]
+        speech_output = "#{0}. Name: {1}. Description: {2}. Language: {3}. " \
+            .format(int(repeat_num)+1, repo['name'],
+                    repo['description'], repo['language'])
+
+        reprompt_text = "Check your Alexa app for more details."
+        should_end_session = False
+
+        speechlet = self._build_speechlet_response_without_card(speech_output, reprompt_text, should_end_session)
+
+        return self._build_response(session['attributes'], speechlet)
+
+    def handle_feeling_lucky(self, intent_request, session):
+        with open('LIST_OF_TIME') as date_file:
+            all_date = [line.strip() for line in date_file.readlines()]
+        with open('LIST_OF_PROGRAMMING_LANGUAGES') as language_file:
+            all_languages = [line.strip() for line in language_file.readlines()]
+
+        rand_date = random.choice(all_date)
+        rand_language = random.choice(all_languages)
+        print(rand_date, rand_language)
+
+        return self.create_repo_response(rand_date, rand_language)
+
+    def create_repo_response(self, date, language):
         top_repos, N_REPOS = github.get_top_repo(date_value=date, language_value=language)
 
         if date is None and language is None:
@@ -145,34 +186,9 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
         card_title = "Top 5 GitHub Repos"
         card_output = card_readout
         speech_output = speech_readout
-        reprompt_text = None
+        reprompt_text = "Check your Alexa app for more details."
         should_end_session = False
 
         speechlet = self._build_speechlet_response(card_title, card_output, speech_output, reprompt_text, should_end_session)
 
         return self._build_response(session_attributes, speechlet)
-
-    def handle_repeat_repo(self, intent_request, session):
-        repeat_num = intent_request['intent']['slots']['Number']['value']  # str
-        repeat_num = str(int(repeat_num)-1)  # account for 0 index, #1->index_0
-
-        top_repos = self._get_attribute('top_repos', session)
-        # None if user asks to repeat a number without asking for repos first
-        if top_repos is None:
-            return self.get_welcome_response()
-
-        # when user asks for a number not provided earlier
-        if repeat_num not in top_repos:
-            return self._build_quick_response(intent_request, session, "#{0} not available".format(int(repeat_num) + 1))
-
-        repo = top_repos[repeat_num]
-        speech_output = "#{0}. Name: {1}. Description: {2}. Language: {3}. " \
-            .format(int(repeat_num)+1, repo['name'],
-                    repo['description'], repo['language'])
-
-        reprompt_text = None
-        should_end_session = False
-
-        speechlet = self._build_speechlet_response_without_card(speech_output, reprompt_text, should_end_session)
-
-        return self._build_response(session['attributes'], speechlet)

@@ -13,22 +13,27 @@ TopRepos what are the top {Language} repos
 TopRepos what are the top {Language} github repos in the past {Date}
 TopRepos what are the top {Language} github repos
 
-TopRepos top repositories
-TopRepos top repos
-TopRepos top github repositories
-TopRepos top github repos
-TopRepos top repos in the past {Date} written in {Language}
-TopRepos top repos in the past {Date}
-TopRepos top repos written in {Language}
-TopRepos top github repos in the past {Date} written in {Language}
-TopRepos top github repos in the past {Date}
-TopRepos top github repos written in {Language}
-TopRepos top {Language} repos in the past {Date}
-TopRepos top {Language} repos
-TopRepos top {Language} github repos in the past {Date}
-TopRepos top {Language} github repos
+TopRepos the top repositories
+TopRepos the top repos
+TopRepos the top github repositories
+TopRepos the top github repos
+TopRepos the top repos in the past {Date} written in {Language}
+TopRepos the top repos in the past {Date}
+TopRepos the top repos written in {Language}
+TopRepos the top github repos in the past {Date} written in {Language}
+TopRepos the top github repos in the past {Date}
+TopRepos the top github repos written in {Language}
+TopRepos the top {Language} repos in the past {Date}
+TopRepos the top {Language} repos
+TopRepos the top {Language} github repos in the past {Date}
+TopRepos the top {Language} github repos
 
 RepeatRepo repeat {Number}
 RepeatRepo repeat number {Number}
 RepeatRepo say {Number} again
 RepeatRepo say number {Number} again
+
+FeelingLucky surprise me
+FeelingLucky feeling lucky
+FeelingLucky I'm feeling lucky
+FeelingLucky I am feeling lucky

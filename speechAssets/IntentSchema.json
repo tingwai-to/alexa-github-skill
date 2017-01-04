@@ -23,6 +23,9 @@
       ]
     },
     {
+      "intent": "FeelingLucky"
+    },
+    {
       "intent": "AMAZON.HelpIntent"
     },
     {
