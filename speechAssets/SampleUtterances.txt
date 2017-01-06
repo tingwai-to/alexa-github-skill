@@ -30,6 +30,8 @@ TopRepos the top {Language} github repos
 
 RepeatRepo repeat {Number}
 RepeatRepo repeat number {Number}
+RepeatRepo repeat {Number} again
+RepeatRepo repeat number {Number} again
 RepeatRepo say {Number} again
 RepeatRepo say number {Number} again
 

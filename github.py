@@ -1,3 +1,4 @@
+from __future__ import print_function
 import requests
 from datetime import date
 from dateutil.relativedelta import relativedelta
@@ -9,7 +10,16 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 def convert_date(date_value):
-    value = relativedelta()
+    """
+    Retrieves date decrement. Defaults to 1 day decrement if not specified.
+
+    Args:
+        date_value (str): see LIST_OF_TIME
+
+    Returns:
+        value (relativedelta):
+    """
+    value = relativedelta(days=1)
     try:
         date_value = date_value.lower()
         table = {'day': relativedelta(days=1),
@@ -19,14 +29,25 @@ def convert_date(date_value):
         if date_value in table:
             value = table[date_value]
         else:
-            value = relativedelta()
+            value = relativedelta(days=1)
     except Exception as exc:
-        logger.exception("Error converting date_value={0}"
-                         .format(date_value))
+        if date_value is not None:
+            logger.exception("Error converting date_value={0}"
+                             .format(date_value))
 
     return value
 
 def convert_language(language_value):
+    """
+    Properly formats language for GitHub search.
+    Defaults to 'null', same as all languages, 'if not specified.
+
+    Args:
+        language_value (str): see LIST_OF_PROGRAMMING_LANGUAGES
+
+    Returns:
+        value (str):
+    """
     value = 'null'
     try:
         language_value = language_value.lower()
@@ -66,13 +87,44 @@ def convert_language(language_value):
         else:
             value = 'null'  # is str for GET request
     except Exception as exc:
-        logger.exception("Error converting language_value={0}"
+        if language_value is not None:
+            logger.exception("Error converting language_value={0}"
                          .format(language_value))
 
     return value
 
 def get_top_repo(date_value=None, language_value=None):
-    N_REPOS = 5
+    """
+    Performs date calculation, GET request to GitHub Search API, and keeps
+    specific repo data.
+
+    Note:
+        Amazon Alexa policy only permits content in languages supported by
+        Alexa, currently English and German. A temporary workaround has been
+        added to filter repos that contain non-ascii characters, obviously not a
+        perfect solution. This will be fixed when a better lightweight solution
+        is found.
+
+    Args:
+        date_value (str): optional argument of date
+        language_value (str): optional argument of programming language
+
+    Returns:
+        top_repos (dict): repo data
+            eg. {'0': {'description': description0,
+                       'html_url': url0,
+                       'language': language0,
+                       'name': name0,
+                       'watchers': int0},
+                 '1': {'description': description1,
+                       'html_url': url1,
+                       'language': language1,
+                       'name': name1,
+                       'watchers': int1},
+                 '#': {...}
+                }
+    """
+    N_REPOS = 3
 
     date_decrement = convert_date(date_value)
     language = convert_language(language_value)
@@ -92,20 +144,30 @@ def get_top_repo(date_value=None, language_value=None):
 
     # response object to json
     data = json.loads(r.text)
-    data = data['items'][0:N_REPOS]  # list of repos
+    data = data['items'][0:10]  # list of repos
 
-    # filter specific keys
+    # filter specific keys, remove non-English repos per Alexa instructions
+    counter = 0
     keys_keep = ['name', 'description', 'language', 'watchers', 'html_url']
     top_repos = {}  # dict used to store in session_attributes
-    for i, repo in enumerate(data):
+    for repo in data:
         filtered = {}
+        isEnglish = True
+
         for key in keys_keep:
-            # remove non-ascii, Alexa can't pronounce foreign characters
+            # remove non-ascii
             if isinstance(repo[key], unicode):
-                filtered[key] = repo[key].encode('ascii', 'ignore')
+                remove_ascii = repo[key].encode('ascii', 'ignore')
+                if repo[key] == remove_ascii:
+                    filtered[key] = remove_ascii
+                else:
+                    isEnglish = False
+                    break
             else:
                 filtered[key] = repo[key]
-        # str(i) because key must be str for session_attributes
-        top_repos[str(i)] = filtered
 
-    return top_repos, N_REPOS  # dict of dicts, int
+        if isEnglish:
+            top_repos[str(counter)] = filtered
+            counter += 1
+
+    return top_repos

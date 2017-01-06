@@ -1,3 +1,4 @@
+from __future__ import print_function
 import abc
 import logging
 
@@ -16,7 +17,6 @@ class AlexaBaseHandler(object):
     def my_logger(self, event, context):
         self.logger.info('Event:{}'.format(event))
         self.logger.info('Context:{}'.format(context))
-        # self.logger.error('')
         return
 
     @abc.abstractmethod
@@ -75,8 +75,8 @@ class AlexaBaseHandler(object):
 
     def process_request(self, event, context):
         """
-        Helper method to process the input Alexa request and
-        dispatch to the appropriate on_ handler
+        Helper method to process the input Alexa request and dispatch to the
+        appropriate on_ handler
 
         :param event:
         :param context:
@@ -105,7 +105,7 @@ class AlexaBaseHandler(object):
     # --------------- Helpers that build all of the responses -----------------
     def _build_speechlet_response_without_card(self, speech_output, reprompt_text, should_end_session):
         """
-        Internal helper method to build the speechlet portion of the response without the card
+        Builds speechlet portion of the response WITHOUT the card
         """
         return {
             'outputSpeech': {
@@ -123,7 +123,7 @@ class AlexaBaseHandler(object):
 
     def _build_speechlet_response(self, card_title, card_output, speech_output, reprompt_text, should_end_session):
         """
-        Internal helper method to build the speechlet portion of the response
+        Builds the speechlet portion of the response
         """
         return {
             'outputSpeech': {
@@ -146,7 +146,7 @@ class AlexaBaseHandler(object):
 
     def _build_speechlet_ssml(self, card_title, card_output, speech_output, reprompt_text, should_end_session):
         """
-        Internal helper method to build the speechlet portion of the response
+        Builds the speechlet portion of the response with SSML speech
         """
         return {
             'outputSpeech': {
@@ -169,7 +169,7 @@ class AlexaBaseHandler(object):
 
     def _build_response(self, session_attributes, speechlet_response):
         """
-        Internal helper method to build the Alexa response message
+        Builds the Alexa response message
         :return: properly formatted Alexa response
         """
         return {
@@ -177,15 +177,6 @@ class AlexaBaseHandler(object):
             'sessionAttributes': session_attributes,
             'response': speechlet_response
         }
-
-    def _build_quick_response(self, intent_request, session, msg):
-        speech_output = msg  # str
-        reprompt_text = None
-        should_end_session = False
-
-        speechlet = self._build_speechlet_response_without_card(speech_output, reprompt_text, should_end_session)
-
-        return self._build_response(session['attributes'], speechlet)
 
     def _is_intent(self, intent_name, intent_request):
         return self._get_intent_name(intent_request) == intent_name
@@ -220,7 +211,7 @@ class AlexaBaseHandler(object):
             else:
                 value = None
         except Exception as exc:
-            self.logger.exception("Error getting slot value for slot_name={0}"
+            self.logger.exception("No value for slot_name={0}"
                                   .format(slot_name))
 
         return value
@@ -244,7 +235,7 @@ class AlexaBaseHandler(object):
             else:
                 attribute = None
         except Exception as exc:
-            self.logger.exception("Error getting attribute for attribute={0}"
+            self.logger.exception("No value for attribute={0}"
                                   .format(attribute_name))
 
         return attribute

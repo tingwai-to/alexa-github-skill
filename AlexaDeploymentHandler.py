@@ -1,3 +1,4 @@
+from __future__ import print_function
 from AlexaBaseHandler import AlexaBaseHandler
 import github
 import random
@@ -29,7 +30,19 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
         return self._build_response(session_attributes, speechlet)
 
     def on_intent(self, intent_request, session):
-        intent = intent_request['intent']
+        """
+        Handles "IntentRequest".
+
+        Args:
+            intent_request (dict): from Alexa
+            session (dict): from Alexa
+
+        Returns:
+            (func): handle functions corresponding to intent
+
+        Raises:
+            ValueError: when intent is not supported
+        """
         intent_name = intent_request['intent']['name']
         print(intent_name)
 
@@ -49,8 +62,10 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
 
     def get_welcome_response(self):
         """
-        Handle skill on_launch. Will repeat if user does not reply
-        :return: output of _build_response
+        Welcome response. Repeats speech if user does not reply.
+
+        Returns:
+            _build_response: passed to Alexa
         """
         session_attributes = {}
         card_title = "Welcome"
@@ -67,8 +82,11 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
 
     def handle_help_response(self):
         """
-        Handle AMAZON.HelpIntent. Will provide examples
-        :return: output of _build_response
+        intent: "AMAZON.HelpIntent"
+        Provides help and examples.
+
+        Returns:
+            _build_response: passed to Alexa
         """
         session_attributes = {}
         card_title = "Help"
@@ -93,6 +111,13 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
         return self._build_response(session_attributes, speechlet)
 
     def handle_session_end_request(self):
+        """
+        intent: "AMAZON.CancelIntent" or "AMAZON.StopIntent"
+        Ends session.
+
+        Returns:
+             _build_response: passed to Alexa
+        """
         session_attributes = {}
         speech_output = "Exiting Repo Tree."
         reprompt_text = None
@@ -103,6 +128,17 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
         return self._build_response(session_attributes, speechlet)
 
     def handle_top_repo(self, intent_request, session):
+        """
+        intent: "TopRepos"
+        Gets (optional) slot value of {Date} and {Language} then builds response.
+
+        Args:
+            intent_request (dict): from Alexa
+            session (dict): from Alexa
+
+        Returns:
+            create_repo_response: speechlet response
+        """
         print(intent_request)
 
         date = self._get_slot_value('Date', intent_request)
@@ -112,6 +148,23 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
         return self.create_repo_response(date, language)
 
     def handle_repeat_repo(self, intent_request, session):
+        """
+        intent: "RepeatRepo"
+        Handles when user asks to repeat a repo previously retrieved/read.
+
+        Note:
+            Calls welcome response if user attempts to repeat a repo
+            without invoking the "TopRepos" intent during session.
+            Tells user an error if user attempts to repeat a repo outside
+            of range.
+
+        Args:
+            intent_request (dict): from Alexa
+            session (dict): from Alexa
+
+        Returns:
+            _build_response: passed to Alexa
+        """
         repeat_num = self._get_slot_value('Number', intent_request)  # str
         repeat_num = str(int(repeat_num)-1)  # account for 0 index, #1->index_0
 
@@ -122,14 +175,20 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
 
         # when user asks for a number not provided earlier
         if repeat_num not in top_repos:
-            return self._build_quick_response(intent_request, session, "#{0} not available".format(int(repeat_num) + 1))
+            speechlet = self._build_speechlet_response_without_card(
+                "#{0} not available".format(int(repeat_num) + 1),
+                "Try asking me something else.", False)
+
+            return self._build_response(session['attributes'], speechlet)
 
         repo = top_repos[repeat_num]
         speech_output = "#{0}. Name: {1}. Description: {2}. Language: {3}. " \
             .format(int(repeat_num)+1, repo['name'],
                     repo['description'], repo['language'])
+        speech_output += "If you would like to hear something again, " \
+                         "ask me to repeat a number."
 
-        reprompt_text = "Check your Alexa app for more details."
+        reprompt_text = "More repo details can be found in your Alexa app."
         should_end_session = False
 
         speechlet = self._build_speechlet_response_without_card(speech_output, reprompt_text, should_end_session)
@@ -137,6 +196,22 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
         return self._build_response(session['attributes'], speechlet)
 
     def handle_feeling_lucky(self, intent_request, session):
+        """
+        intent: "FeelingLucky"
+        Randomizes a date and language.
+
+        Note:
+            LIST_OF_TIME and LIST_OF_PROGRAMMING_LANGUAGES files are located
+            in a subdirectory but is copied to root when a .zip is created
+            from create_deployment.py
+
+        Args:
+            intent_request (dict): from Alexa
+            session (dict): from Alexa
+
+        Returns:
+            create_repo_response: speechlet response
+        """
         with open('LIST_OF_TIME') as date_file:
             all_date = [line.strip() for line in date_file.readlines()]
         with open('LIST_OF_PROGRAMMING_LANGUAGES') as language_file:
@@ -149,7 +224,23 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
         return self.create_repo_response(rand_date, rand_language)
 
     def create_repo_response(self, date, language):
-        top_repos, N_REPOS = github.get_top_repo(date_value=date, language_value=language)
+        """
+        Performs GitHub search API call using date and language arguments.
+        Creates speechlet response for Alexa including card/speech output.
+
+        Note:
+            If no date/language is specified, date defaults to past day and
+            language defaults to all programming languages in GitHub
+
+        Args:
+            date (str): the past [day, week, month, year]
+            language (str): programming languages, see LIST_OF_PROGRAMMING_LANGUAGES
+
+        Returns:
+            _build_response: passed to Alexa
+        """
+        top_repos = github.get_top_repo(date_value=date, language_value=language)
+        N_REPOS = len(top_repos)
 
         if date is None and language is None:
             date_readout = 'day'
@@ -164,10 +255,10 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
             date_readout = date
             language_readout = github.convert_language(language)
 
-        speech_readout = "Top five {1} repos in the past {0} are, \n"\
-            .format(date_readout, language_readout)
-        card_readout = "Top five {1} repos in the past {0}: \n"\
-            .format(date_readout, language_readout)
+        speech_readout = "Top {0} {2} repos in the past {1} are, \n"\
+            .format(N_REPOS, date_readout, language_readout)
+        card_readout = "Top {0} {2} repos in the past {1}: \n"\
+            .format(N_REPOS, date_readout, language_readout)
 
         for i in range(N_REPOS):
             repo = top_repos[str(i)]
@@ -181,12 +272,14 @@ class AlexaDeploymentHandler(AlexaBaseHandler):
                             "URL: {4} \n" \
                 .format(i+1, repo['name'], repo['description'],
                         repo['language'], repo['html_url'])
+        speech_readout += "If you would like to hear a repo again, " \
+                          "ask me to repeat a number."
 
         session_attributes = {'top_repos': top_repos}
-        card_title = "Top 5 GitHub Repos"
+        card_title = "Top {0} GitHub Repos".format(N_REPOS)
         card_output = card_readout
         speech_output = speech_readout
-        reprompt_text = "Check your Alexa app for more details."
+        reprompt_text = "More repo details can be found in your Alexa app."
         should_end_session = False
 
         speechlet = self._build_speechlet_response(card_title, card_output, speech_output, reprompt_text, should_end_session)
